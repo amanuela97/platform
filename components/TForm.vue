@@ -8,11 +8,8 @@
         :label="getLabel(field)"
         @input="(val) => onFieldChange(field, val)"
       />
-      <div
-        v-if="$v.form[field.name].$error"
-        class="text-red-500 py-4 text-right"
-      >
-        invalid input
+      <div v-if="v[field.name].$errors[0]" class="text-red-500 py-4 text-right">
+        {{ v[field.name].$errors[0].$message }}
       </div>
     </div>
     <slot name="bottom" />
@@ -77,22 +74,15 @@ export default {
     fieldWrapper: {
       type: String,
       default: ''
+    },
+    v: {
+      type: Object,
+      required: true
     }
   },
-  data() {
-    return {
-      form: this.value
-    }
-  },
-  validations() {
-    const rules = Object.fromEntries(
-      this.fields.map((field) => [field.name, field.validations])
-    )
-    return {
-      form: rules,
-      error: false
-    }
-  },
+  data: () => ({
+    error: true
+  }),
   computed: {
     visibleFields() {
       const fields = this.fields
@@ -153,19 +143,14 @@ export default {
       if (!this.validate()) {
         return
       }
-
-      this.$v.form.$touch()
-      console.log(this.$v.form, this.value)
-      if (this.$v.form.$pending || this.$v.form.$error) return
-
+      this.v.$validate()
+      if (this.v.$pending || this.v.$error || this.v.$silentErrors) {
+        return
+      }
       this.$emit('save', this.value)
     },
     onFieldChange(field, value) {
       const val = { ...this.value }
-
-      this.form[field.name] = value
-      this.$v.form[field.name].$touch()
-
       if (value) {
         this.$set(val, field.name, value)
       } else {
