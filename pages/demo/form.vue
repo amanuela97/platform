@@ -4,6 +4,7 @@
     <TForm
       v-model="data"
       :fields="fields"
+      :field-config="{ labelPosition: 'top' }"
       class="space-y-4"
       submit-label="Submit"
       @save="submit"
@@ -12,7 +13,7 @@
 </template>
 
 <script>
-import { required, email, alphaNum, minLength } from 'vuelidate/lib/validators'
+import { required, email, minLength, alphaNum } from 'vuelidate/lib/validators'
 import { ref } from '@nuxtjs/composition-api'
 
 export default {
@@ -39,7 +40,7 @@ export default {
         key: 'profile.username',
         type: 'username',
         before: 'Use only letters, numbers, underscores and periods.',
-        validations: { required, alphaNum }
+        validations: { required, alphaNum, minLength: minLength(4) }
       },
       {
         name: 'place',
