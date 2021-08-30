@@ -8,9 +8,12 @@
         :label="getLabel(field)"
         @input="(val) => onFieldChange(field, val)"
       />
-    </div>
-    <div v-if="error" class="text-red-500 py-4 text-right">
-      {{ error.message }}
+      <div
+        v-if="$v.form[field.name].$error"
+        class="text-red-500 py-4 text-right"
+      >
+        invalid input
+      </div>
     </div>
     <slot name="bottom" />
     <div
@@ -76,9 +79,20 @@ export default {
       default: ''
     }
   },
-  data: () => ({
-    error: false
-  }),
+  data() {
+    return {
+      form: this.value
+    }
+  },
+  validations() {
+    const rules = Object.fromEntries(
+      this.fields.map((field) => [field.name, field.validations])
+    )
+    return {
+      form: rules,
+      error: false
+    }
+  },
   computed: {
     visibleFields() {
       const fields = this.fields
@@ -98,7 +112,6 @@ export default {
           admin: true
         })
       }
-
       return fields.map((f) => ({ ...f, ...this.fieldConfig }))
     }
   },
@@ -133,20 +146,26 @@ export default {
       if (!this.validate()) {
         return
       }
-
       this.$emit('copy', this.value)
     },
     save() {
       this.error = false
-
       if (!this.validate()) {
         return
       }
+
+      this.$v.form.$touch()
+      console.log(this.$v.form, this.value)
+      if (this.$v.form.$pending || this.$v.form.$error) return
 
       this.$emit('save', this.value)
     },
     onFieldChange(field, value) {
       const val = { ...this.value }
+
+      this.form[field.name] = value
+      this.$v.form[field.name].$touch()
+
       if (value) {
         this.$set(val, field.name, value)
       } else {

@@ -12,12 +12,10 @@
 
 <script>
 import { useDoc } from '~/use/doc'
-
 export default {
   name: 'TInputUsername',
   setup() {
     const { find, id } = useDoc('profiles')
-
     return {
       find,
       id
@@ -55,19 +53,15 @@ export default {
   methods: {
     async save(newName) {
       this.error = ''
-
       if (newName === this.value) {
         return
       }
-
       await this.find('username', newName)
-
       if (this.id && this.id !== this.item.id) {
         this.error = 'This name is already taken'
         this.$emit('input', this.value)
         return
       }
-
       this.$emit('input', newName)
     }
   }
