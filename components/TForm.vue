@@ -8,8 +8,11 @@
         :label="getLabel(field)"
         @input="(val) => onFieldChange(field, val)"
       />
-      <div v-if="v[field.name].$errors[0]" class="text-red-500 py-4 text-right">
-        {{ v[field.name].$errors[0].$message }}
+      <div
+        v-if="v$.form[field.name].$errors[0]"
+        class="text-red-500 py-4 text-right"
+      >
+        {{ v$.form[field.name].$errors[0].$message }}
       </div>
     </div>
     <slot name="bottom" />
@@ -31,8 +34,8 @@
 </template>
 
 <script>
+import { useVuelidate } from '@vuelidate/core'
 import { camelcase } from '~/utils'
-
 export default {
   name: 'TForm',
   components: {
@@ -74,21 +77,30 @@ export default {
     fieldWrapper: {
       type: String,
       default: ''
-    },
-    v: {
-      type: Object,
-      required: true
     }
   },
-  data: () => ({
-    error: true
-  }),
+  setup() {
+    return { v$: useVuelidate() }
+  },
+  data() {
+    return {
+      form: this.value,
+      error: true
+    }
+  },
+  validations() {
+    const rules = Object.fromEntries(
+      this.fields.map((field) => [field.name, field.validations])
+    )
+    return {
+      form: rules
+    }
+  },
   computed: {
     visibleFields() {
       const fields = this.fields
         .filter((f) => f)
         .filter((field) => !field.when || field.when(this.value))
-
       if (this.editCreator) {
         fields.push({
           name: 'createdBy',
@@ -116,23 +128,23 @@ export default {
       if (typeof field === 'string') {
         return camelcase(field)
       }
-
       if (field.key) {
         return this.$t(field.key)
       }
-
       if (field.label) {
         return field.label
       }
-
       return camelcase(field.name)
     },
     validate() {
+      this.v$.$validate()
+      if (this.v$.$error || this.v$.$pending || this.v$.$silentErrors[0]) {
+        return false
+      }
       return true
     },
     copy() {
       this.error = false
-
       if (!this.validate()) {
         return
       }
@@ -143,20 +155,16 @@ export default {
       if (!this.validate()) {
         return
       }
-      this.v.$validate()
-      if (this.v.$pending || this.v.$error || this.v.$silentErrors) {
-        return
-      }
       this.$emit('save', this.value)
     },
     onFieldChange(field, value) {
       const val = { ...this.value }
+      this.form[field.name] = value
       if (value) {
         this.$set(val, field.name, value)
       } else {
         this.$set(val, field.name, '')
       }
-
       if (field && field.onChange) {
         field.onChange(val)
       }

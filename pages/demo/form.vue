@@ -4,7 +4,6 @@
     <TForm
       v-model="data"
       :fields="fields"
-      :v="v$"
       :field-config="{ labelPosition: 'top' }"
       class="space-y-4"
       submit-label="Submit"
@@ -14,7 +13,6 @@
 </template>
 
 <script>
-import { useVuelidate } from '@vuelidate/core'
 import {
   required,
   email,
@@ -24,7 +22,6 @@ import {
 } from '@vuelidate/validators'
 import { ref } from '@nuxtjs/composition-api'
 import { useDoc } from '~/use/doc'
-
 export default {
   name: 'Form',
   setup() {
@@ -116,14 +113,9 @@ export default {
         }
       }
     ]
-    const rules = Object.fromEntries(
-      fields.map((field) => [field.name, field.validations])
-    )
-    const v$ = useVuelidate(rules, data)
     return {
       data,
       fields,
-      v$,
       find,
       exists
     }
