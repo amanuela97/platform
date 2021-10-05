@@ -103,36 +103,40 @@ export default {
   validations() {
     const rules = Object.fromEntries(
       this.fields.map((field) => {
-        const validations = Object.fromEntries(
-          Object.entries(field.validations).map((name) => {
-            if (name[0] === 'isUnique') {
-              return [
-                name[0],
-                validators.helpers.withMessage(
-                  `validation.${field.name}.${name[0]}`,
-                  validators.helpers.withAsync(this.isUnique)
-                )
-              ]
-            } else if (typeof name[1] !== 'boolean') {
-              return [
-                name[0],
-                validators.helpers.withMessage(
-                  `validation.${field.name}.${name[0]}`,
-                  validators[name[0]](name[1])
-                )
-              ]
-            } else {
-              return [
-                name[0],
-                validators.helpers.withMessage(
-                  `validation.${field.name}.${name[0]}`,
-                  validators[name[0]]
-                )
-              ]
-            }
-          })
-        )
-        return [field.name, validations]
+        if (field.validations) {
+          const validations = Object.fromEntries(
+            Object.entries(field.validations).map((name) => {
+              if (name[0] === 'isUnique') {
+                return [
+                  name[0],
+                  validators.helpers.withMessage(
+                    `validation.${field.name}.${name[0]}`,
+                    validators.helpers.withAsync(this.isUnique)
+                  )
+                ]
+              } else if (typeof name[1] !== 'boolean') {
+                return [
+                  name[0],
+                  validators.helpers.withMessage(
+                    `validation.${field.name}.${name[0]}`,
+                    validators[name[0]](name[1])
+                  )
+                ]
+              } else {
+                return [
+                  name[0],
+                  validators.helpers.withMessage(
+                    `validation.${field.name}.${name[0]}`,
+                    validators[name[0]]
+                  )
+                ]
+              }
+            })
+          )
+          return [field.name, validations]
+        } else {
+          return [field.name, '']
+        }
       })
     )
     return {

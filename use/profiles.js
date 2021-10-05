@@ -228,12 +228,6 @@ export const profileFields = [
     name: 'username',
     key: 'profile.username',
     register: true,
-    validations: {
-      required: true,
-      minLength: 4,
-      alphaNum: true,
-      isUnique: true
-    },
     poster: true,
     required: true,
     type: 'username',
@@ -243,9 +237,6 @@ export const profileFields = [
     name: 'place',
     label: 'Your city',
     register: true,
-    validations: {
-      required: true
-    },
     poster: true,
     required: true,
     type: 'place',

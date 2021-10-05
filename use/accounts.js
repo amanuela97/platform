@@ -12,10 +12,6 @@ export const accountFields = [
     name: 'email',
     key: 'account.email',
     register: true,
-    validations: {
-      required: true,
-      email: true
-    },
     required: true,
     event: true
   },
@@ -23,11 +19,7 @@ export const accountFields = [
     name: 'password',
     type: 'password',
     label: 'New Password',
-    register: true,
-    validations: {
-      required: true,
-      minLength: 8
-    }
+    register: true
   },
   {
     name: 'phone',
@@ -74,19 +66,19 @@ export const accountFields = [
     type: 'select',
     label: 'Do you have a partner?',
     options: ['Yes', 'No'],
-    event: true
+    event: false
   },
   {
     name: 'partnerName',
     label: "Partner's name",
     when: (answers) => answers?.withPartner === 'Yes',
-    event: true
+    event: false
   },
   {
     name: 'partnerEmail',
     label: "Partner's email",
     when: (answers) => answers?.withPartner === 'Yes',
-    event: true
+    event: false
   }
 ]
 

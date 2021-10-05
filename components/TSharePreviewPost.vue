@@ -73,13 +73,11 @@
 <script>
 import { useApp } from '~/use/app'
 import { useStyles } from '~/use/styles'
-
 export default {
   setup(props) {
     const { getStyles } = useStyles()
     const { getPosterLabelColor } = useApp()
     const labelColor = getPosterLabelColor(props.collection, props.type)
-
     return { getStyles, labelColor }
   },
   props: {
@@ -150,11 +148,9 @@ export default {
         Advanced: '3_of_4',
         Master: '4_of_4'
       }
-
       if (!map[level]) {
         return '0_of_4'
       }
-
       return map[level]
     }
   }
